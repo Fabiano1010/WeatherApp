@@ -1,0 +1,171 @@
+﻿@{
+    var countries = ViewBag.Countries as List<WeatherApp.Models.Country>;
+    var citiesJson = ViewBag.CitiesJson;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wather App</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/style.css")">
+</head>
+<body>
+<div class="container">
+    <h1> <img src="@Url.Content("~/res/sun.svg")"/>Check Weather</h1>
+    
+    <div class="form-box">
+        <label>Choose Country</label>
+        <select id="countrySelect">
+            <option value="">-- choose --</option>
+            @foreach (var c in countries) {
+                <option value="@c.Code">@c.Name</option>
+            }
+                
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Wybierz miasto</label>
+        <select id="citySelect" disabled>
+            <option value="">-- choose country first --</option>
+        </select>
+    </div>
+
+    <button id="submitBtn">Check</button>
+        
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+        
+    <div class="weather-card" id="weatherCard">
+        <div class="weather-icon" id="weatherIcon"></div>
+        <div class="temp" id="temperature">--</div>
+        <div class="weather-desc" id="description">--</div>
+        <div class="details">
+            <div class="detail"><img src="@Url.Content("~/res/thermometer.svg")" class="detailsImg"/>Feels like<br><strong id="feelsLike">--</strong>°C</div>
+            <div class="detail"><img src="@Url.Content("~/res/droplet.svg")" class="detailsImg"/>Humidity<br><strong id="humidity">--</strong>%</div>
+            <div class="detail"><img src="@Url.Content("~/res/wind.svg")" class="detailsImg"/>Wind<br><strong id="wind">--</strong> m/s</div>
+            <div class="detail"><img src="@Url.Content("~/res/gauge.svg")" class="detailsImg"/>Pressure<br><strong id="pressure">--</strong> hPa</div>
+        </div>
+    </div>
+
+    <div class="error" id="error"></div>
+</div>
+<script>
+    const cityData = @Html.Raw(citiesJson);
+    const countrySelect = document.getElementById('countrySelect');
+    const citySelect = document.getElementById('citySelect');
+    const submitBtn = document.getElementById('submitBtn');
+    const weatherCard = document.getElementById('weatherCard');
+    const errorDiv = document.getElementById('error');
+    const loadingDiv = document.getElementById('loading');
+    
+    countrySelect.addEventListener('change', function() {
+        const choosenCountry = this.value;
+        citySelect.innerHTML = '<option value="">-- wybierz miasto --</option>';
+        if (choosenCountry && cityData[choosenCountry]) {
+            citySelect.disabled = false;
+            cityData[choosenCountry].forEach(city => {
+               const option = document.createElement('option');
+               option.value = city.Name;
+               option.textContent = city.Name;
+               citySelect.appendChild(option);
+              });
+        } else {
+            citySelect.disabled = true;
+        }
+        weatherCard.classList.remove('show');
+        errorDiv.classList.remove('show');
+        
+    });
+    
+    submitBtn.addEventListener('click', async () => {
+        const country = countrySelect.value;
+        const city = citySelect.value;
+        
+        if(!country || !city) {
+            showError("Choose country and city")
+            return;
+        }
+        
+        weatherCard.classList.remove('show');
+        errorDiv.classList.remove('show');
+        loadingDiv.classList.add('show');
+        submitBtn.disabled = true;
+        
+        try {
+            const response = await fetch('/Weather/GetWeather', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ country, city })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                showError(data.error);
+            } else {
+                displayWeather(data);
+            }
+        } catch (err) {
+            showError('Connection error');
+        } finally {
+            loadingDiv.classList.remove('show');
+            submitBtn.disabled = false;
+        }
+    })
+    
+    function displayWeather(data) {
+        document.getElementById('temperature').innerHTML = `<img src="@Url.Content("~/res/thermometer.svg")"/>${Math.round(data.temperature)}°C`;
+        document.getElementById('feelsLike').innerHTML = Math.round(data.feelsLike);
+        document.getElementById('humidity').innerHTML = data.humidity;
+        document.getElementById('wind').innerHTML = data.wind;
+        document.getElementById('pressure').innerHTML = data.pressure;
+        
+        
+        weatherCard.classList.add('show');
+        
+        if(Math.round(data.temperature) > 10 && Math.round(data.temperature) <= 20){
+            document.getElementById('temperature').classList.add('temp2');
+        } else if(Math.round(data.temperature) > 20){
+            document.getElementById('temperature').classList.add('temp3');
+        } else {
+            document.getElementById('temperature').classList.remove('temp2');
+            document.getElementById('temperature').classList.remove('temp3');
+        }
+
+        if(data.description.includes('rain')) {
+            document.getElementById('description').innerHTML = `<img src="@Url.Content("~/res/cloud-rain.svg")" class='detailsImg'/>`+data.description;
+            
+        } else if(data.description.includes('clear')) {
+            document.getElementById('description').innerHTML =`<img src="@Url.Content("~/res/sun.svg")" class="detailsImg"/>` +data.description;
+            
+        }
+        else if(data.description.includes('snow')) {
+            document.getElementById('description').innerHTML =`<img src="@Url.Content("~/res/cloud-snow.svg")" class="detailsImg"/>` +data.description;
+        } 
+        else if(data.description.includes('thunderstorm')) {
+            document.getElementById('description').innerHTML =`<img src="@Url.Content("~/res/cloud-storm.svg")" class="detailsImg"/>` +data.description ;
+            
+        }
+        else if(data.description.includes('clouds')) {
+            document.getElementById('description').innerHTML =`<img src="@Url.Content("~/res/cloud.svg")" class="detailsImg"/>` +data.description ;
+          
+        } else{
+            document.getElementById('description').innerHTML = data.description;
+        }
+        
+        
+    }
+    
+    function showError(error) {
+        errorDiv.innerHTML = `${error}`;
+        errorDiv.classList.add('show');
+    }
+    
+</script>
+
+</body>
+</html>

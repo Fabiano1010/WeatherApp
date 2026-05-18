@@ -1,0 +1,61 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\Home\\RiderProjects\\WeatherApp\\WeatherApp\\wwwroot\\css\\style.css",
+      "PackagePath": "staticwebassets\\css\\style.css"
+    },
+    {
+      "Id": "C:\\Users\\Home\\RiderProjects\\WeatherApp\\WeatherApp\\wwwroot\\res\\cloud-rain.svg",
+      "PackagePath": "staticwebassets\\res\\cloud-rain.svg"
+    },
+    {
+      "Id": "C:\\Users\\Home\\RiderProjects\\WeatherApp\\WeatherApp\\wwwroot\\res\\cloud-snow.svg",
+      "PackagePath": "staticwebassets\\res\\cloud-snow.svg"
+    },
+    {
+      "Id": "C:\\Users\\Home\\RiderProjects\\WeatherApp\\WeatherApp\\wwwroot\\res\\cloud-storm.svg",
+      "PackagePath": "staticwebassets\\res\\cloud-storm.svg"
+    },
+    {
+      "Id": "C:\\Users\\Home\\RiderProjects\\WeatherApp\\WeatherApp\\wwwroot\\res\\cloud.svg",
+      "PackagePath": "staticwebassets\\res\\cloud.svg"
+    },
+    {
+      "Id": "C:\\Users\\Home\\RiderProjects\\WeatherApp\\WeatherApp\\wwwroot\\res\\droplet.svg",
+      "PackagePath": "staticwebassets\\res\\droplet.svg"
+    },
+    {
+      "Id": "C:\\Users\\Home\\RiderProjects\\WeatherApp\\WeatherApp\\wwwroot\\res\\gauge.svg",
+      "PackagePath": "staticwebassets\\res\\gauge.svg"
+    },
+    {
+      "Id": "C:\\Users\\Home\\RiderProjects\\WeatherApp\\WeatherApp\\wwwroot\\res\\sun.svg",
+      "PackagePath": "staticwebassets\\res\\sun.svg"
+    },
+    {
+      "Id": "C:\\Users\\Home\\RiderProjects\\WeatherApp\\WeatherApp\\wwwroot\\res\\thermometer.svg",
+      "PackagePath": "staticwebassets\\res\\thermometer.svg"
+    },
+    {
+      "Id": "C:\\Users\\Home\\RiderProjects\\WeatherApp\\WeatherApp\\wwwroot\\res\\wind.svg",
+      "PackagePath": "staticwebassets\\res\\wind.svg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.WeatherApp.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.WeatherApp.props",
+      "PackagePath": "build\\WeatherApp.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.WeatherApp.props",
+      "PackagePath": "buildMultiTargeting\\WeatherApp.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.WeatherApp.props",
+      "PackagePath": "buildTransitive\\WeatherApp.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
