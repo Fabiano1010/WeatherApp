@@ -1,8 +1,4 @@
 # syntax=docker/dockerfile:1.7
-# Rozszerzony frontend BuildKit – umożliwia użycie mount=type=ssh / mount=type=secret
-# oraz innych zaawansowanych dyrektyw RUN --mount.
-
-# ─── Etap 1: build ────────────────────────────────────────────────────────────
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 
 ARG BUILDPLATFORM
@@ -11,19 +7,12 @@ ARG TARGETARCH
 
 WORKDIR /src
 
-# Pobranie kodu źródłowego z publicznego repozytorium GitHub
-# przy użyciu klucza SSH (mount=type=ssh) – klucz NIE trafia do warstw obrazu.
-# Jeśli repozytorium jest publiczne i nie wymaga SSH, można zastąpić to:
-#   RUN --mount=type=cache,target=/root/.nuget/packages \
-#       git clone https://github.com/<user>/<repo>.git .
-RUN --mount=type=ssh \
-    apk add --no-cache git openssh-client && \
-    mkdir -p -m 0600 ~/.ssh && \
-    ssh-keyscan github.com >> ~/.ssh/known_hosts && \
-    git clone git@github.com:FabianSkrzypczynski/WeatherApp.git .
+RUN --mount=type=secret,id=gh_token \
+    apk add --no-cache git && \
+    GH_TOKEN=$(cat /run/secrets/gh_token) && \
+    git clone https://oauth2:${GH_TOKEN}@github.com/Fabiano1010/WeatherApp.git .
 
-# Restore – z wykorzystaniem cache NuGet montowanego przez BuildKit
-# (nie trafia do obrazu finalnego; reużywany między buildami).
+
 RUN --mount=type=cache,target=/root/.nuget/packages,sharing=locked \
     --mount=type=cache,target=/src/WeatherApp/obj,sharing=locked \
     dotnet restore ./WeatherApp/WeatherApp.csproj \
@@ -32,7 +21,6 @@ RUN --mount=type=cache,target=/root/.nuget/packages,sharing=locked \
         /p:RestoreFallbackFolders="" \
         /p:RestoreAdditionalProjectFallbackFolders=""
 
-# Publish
 RUN --mount=type=cache,target=/root/.nuget/packages,sharing=locked \
     --mount=type=cache,target=/src/WeatherApp/obj,sharing=locked \
     dotnet publish ./WeatherApp/WeatherApp.csproj \
@@ -47,7 +35,6 @@ RUN --mount=type=cache,target=/root/.nuget/packages,sharing=locked \
         /p:DebugSymbols=false \
         -o /app/publish
 
-# ─── Etap 2: runtime ──────────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS runtime
 
 LABEL org.opencontainers.image.authors="Fabian Skrzypczynski" \
