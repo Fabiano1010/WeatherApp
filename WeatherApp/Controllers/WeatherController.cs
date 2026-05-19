@@ -7,7 +7,7 @@ namespace WeatherApp.Controllers;
 
 public class WeatherController : Controller {
     private readonly HttpClient _httpClient;
-    private const string ApiKey = "a1111acc13d7a1d98cafa33ae5a337b8";
+    private const string ApiKey = "";
 
     public WeatherController() {
         _httpClient = new HttpClient();
