@@ -7,10 +7,12 @@ namespace WeatherApp.Controllers;
 
 public class WeatherController : Controller {
     private readonly HttpClient _httpClient;
-    private const string ApiKey = "";
+    private readonly string _apiKey;
 
     public WeatherController() {
         _httpClient = new HttpClient();
+        _apiKey = Environment.GetEnvironmentVariable("OPENWEATHER_API_KEY")
+                  ?? throw new InvalidOperationException("OPENWEATHER_API_KEY is not set");
     }
 
     public IActionResult Index() {
@@ -50,7 +52,7 @@ public class WeatherController : Controller {
 
         try {
             var url =
-                $"https://api.openweathermap.org/data/2.5/weather?q={city},{country}&appid={ApiKey}&units=metric&lang=en"; 
+                $"https://api.openweathermap.org/data/2.5/weather?q={city},{country}&appid={_apiKey}&units=metric&lang=en"; 
             var response = await _httpClient.GetAsync(url);
 
             if (!response.IsSuccessStatusCode) {
